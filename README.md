@@ -1,3 +1,16 @@
+<p>
+	<img src="https://img.shields.io/badge/Maven-green.svg" ></img>
+	<a target="_blank" href="https://www.oracle.com/technetwork/java/javase/downloads/index.html">
+		<img src="https://img.shields.io/badge/JDK-1.8+-blue.svg" ></img>
+	</a>
+	<img src="https://img.shields.io/badge/SpringBoot-2-green.svg" ></img>
+	<img src="https://img.shields.io/badge/SQL-pink.svg" ></img>
+  <img src="https://img.shields.io/badge/SpringCloud-green.svg" ></img>
+	<img src="https://img.shields.io/badge/Spring-red.svg" ></img>
+	<img src="https://img.shields.io/badge/设计模式-purple.svg" ></img>
+
+</p>
+
 # java-learning
 
 #### 个人博客 [Dynasty](https://ycf-code.xyz)
