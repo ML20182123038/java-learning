@@ -2,7 +2,7 @@
 title: SpringBoot整合Redis
 description: Redis介绍，Redis序列化机制，封装Redis工具类。
 date: 2021-04-26
-image: redisred.jpg
+image: https://gitee.com/ycfxhsw/picture/raw/master/ssredis.png
 tags: 
     - Redis
     - SpringBoot
