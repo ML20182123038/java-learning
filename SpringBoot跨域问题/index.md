@@ -10,6 +10,7 @@ categories:
     - Spring
     - SpringBoot
     - JAVA
+
 ---
 
 
@@ -20,9 +21,163 @@ categories:
 
 在Spring框架中，对于CORS也提供了相应的解决方案。
 
+#### 非同源限制
+
+- 无法读取非同源网页的 Cookie、LocalStorage 和 IndexedDB
+- 无法接触非同源网页的 DOM
+- 无法向非同源地址发送 AJAX 请求
 
 
-### 二、实践
+
+### 二、java后端实现CORS跨域请求的方式
+
+1. 返回新的CorsFilter
+2. 重写 WebMvcConfigurer
+3. 使用注解 @CrossOrigin
+4. 手动设置响应头 (HttpServletResponse)
+5. 自定web filter 实现跨域
+
+**注意：**
+
+- `CorFilter / WebMvConfigurer / @CrossOrigin` 需要 SpringMVC 4.2以上版本才支持，对应springBoot 1.3版本以上
+- 上面前两种方式属于全局 CORS 配置，后两种属于局部 CORS配置。如果使用了局部跨域是会覆盖全局跨域的规则，所以可以通过 @CrossOrigin 注解来进行细粒度更高的跨域资源控制。
+- 其实无论哪种方案，最终目的都是修改响应头，向响应头中添加浏览器所要求的数据，进而实现跨域
+
+
+
+#### 1.返回新的 CorsFilter(全局跨域)
+
+在任意配置类，返回一个 新的 CorsFIlter Bean ，并添加映射路径和具体的CORS配置路径。
+
+```java
+@Configuration
+public class GlobalCorsConfig {
+    @Bean
+    public CorsFilter corsFilter() {
+        //1. 添加 CORS配置信息
+        CorsConfiguration config = new CorsConfiguration();
+        //放行哪些原始域
+        config.addAllowedOrigin("*");
+        //是否发送 Cookie
+        config.setAllowCredentials(true);
+        //放行哪些请求方式
+        config.addAllowedMethod("*");
+        //放行哪些原始请求头部信息
+        config.addAllowedHeader("*");
+        //暴露哪些头部信息
+        config.addExposedHeader("*");
+        //2. 添加映射路径
+        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        corsConfigurationSource.registerCorsConfiguration("/**",config);
+        //3. 返回新的CorsFilter
+        return new CorsFilter(corsConfigurationSource);
+    }
+}
+```
+
+
+
+#### 2. 重写 WebMvcConfigurer(全局跨域)
+
+```java
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+              //是否发送Cookie
+              .allowCredentials(true)
+              //放行哪些原始域
+              .allowedOrigins("*")
+              .allowedMethods(new String[]{"GET", "POST", "PUT", "DELETE"})
+              .allowedHeaders("*")
+              .exposedHeaders("*");
+    }
+}
+```
+
+
+
+#### 3. 使用注解 (局部跨域)
+
+在控制器(类上)上使用注解 `@CrossOrigin`:，表示该类的所有方法允许跨域。
+
+```java
+@RestController
+@CrossOrigin(origins = "*")
+public class HelloController {
+    @RequestMapping("/hello")
+    public String hello() {
+        return "hello world";
+    }
+}
+```
+
+在方法上使用注解 @CrossOrigin:
+
+```java
+@RequestMapping("/hello")
+@CrossOrigin(origins = "*")
+//@CrossOrigin(value = "http://localhost:8081") //指定具体ip允许跨域
+public String hello() {
+    return "hello world";
+}
+```
+
+
+
+#### 4. 手动设置响应头(局部跨域)
+
+使用 HttpServletResponse 对象添加响应头(Access-Control-Allow-Origin)来授权原始域，这里 Origin的值也可以设置为 “*”,表示全部放行。
+
+```java
+@RequestMapping("/index")
+public String index(HttpServletResponse response) {
+    response.addHeader("Access-Allow-Control-Origin","*");
+    return "index";
+}
+```
+
+
+
+#### 5. 使用自定义filter实现跨域
+
+首先编写一个过滤器，可以起名字为MyCorsFilter.java
+
+```java
+@Component
+public class MyCorsFilter implements Filter {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        HttpServletResponse response = (HttpServletResponse) res;
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
+        chain.doFilter(req, res);
+    }
+    public void init(FilterConfig filterConfig) {}
+    public void destroy() {}
+}
+```
+
+在web.xml中配置这个过滤器，使其生效
+
+```xml
+<!-- 跨域访问 START-->
+<filter>
+  <filter-name>CorsFilter</filter-name>
+  <filter-class>com.mesnac.aop.MyCorsFilter</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>CorsFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
+<!-- 跨域访问 END  -->
+```
+
+
+
+### 三、例子
 
 首先创建两个普通的SpringBoot项目，第一个命名为provider提供服务，第二个命名为consumer消费服务，第一个配置端口为8080，第二个配置配置为8081，然后在provider上提供两个hello接口，一个get，一个post，如下：
 
@@ -40,8 +195,6 @@ public class Provider {
     }
 }
 ```
-
-
 
 在consumer的resources/templates目录下创建一个html文件，发送一个简单的ajax请求，如下：
 
@@ -79,8 +232,6 @@ public class Provider {
 
 可以看到，由于同源策略的限制，请求无法发送成功。
 
-
-
 使用CORS可以在前端代码不做任何修改的情况下，实现跨域，那么接下来看看在provider中如何配置。首先可以通过@CrossOrigin注解配置某一个方法接受某一个域的请求，如下：
 
 ```java
@@ -102,8 +253,6 @@ public class Provider {
 
 这个注解表示这两个接口接受来自http://localhost:8081地址的请求，配置完成后，重启provider，再次发送请求，浏览器控制台就不会报错了，consumer也能拿到数据了。
 
-
-
 provider上，每一个方法上都去加注解未免太麻烦了，在Spring Boot中，还可以通过全局配置一次性解决这个问题，全局配置只需要在配置类中重写addCorsMappings方法即可，如下：
 
 ```java
@@ -123,7 +272,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 
 
-### 存在的问题
+### 四、存在的问题
 
 了解了整个CORS的工作过程之后，我们通过Ajax发送跨域请求，虽然用户体验提高了，但是也有潜在的威胁存在，常见的就是CSRF（Cross-site request forgery）跨站请求伪造。跨站请求伪造也被称为one-click attack 或者 session riding，通常缩写为CSRF或者XSRF，是一种挟制用户在当前已登录的Web应用程序上执行非本意的操作的攻击方法，举个例子：
 
