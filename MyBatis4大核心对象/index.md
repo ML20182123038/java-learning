@@ -8,6 +8,7 @@ tags:
 categories: 
     - 数据库
     - JAVA
+
 ---
 
 利用MyBatis来完成一次数据库操作需要经过以下步骤：
@@ -158,6 +159,7 @@ SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reade
     ```
 
 - Properties properties：
+
 - 上面dataSource内的属性没有直接输入，而是采用了${jdbc.driver}来配置，而这些属性的值我们可以单独维护在一个properties文件内。
 
 ```properties
@@ -237,13 +239,15 @@ SqlSession openSession(ExecutorType execType, Connection connection);
 private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
     Transaction tx = null;
     try {
+        // 获取配置好的环境
         final Environment environment = configuration.getEnvironment();
         final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
         tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
         final Executor executor = configuration.newExecutor(tx, execType);
         return new DefaultSqlSession(configuration, executor, autoCommit);
     } catch (Exception e) {
-        closeTransaction(tx); // may have fetched a connection so lets call close()
+        // may have fetched a connection so lets call close()
+        closeTransaction(tx); 
         throw ExceptionFactory.wrapException("Error opening session.  Cause: " + e, e);
     } finally {
         ErrorContext.instance().reset();
@@ -256,16 +260,21 @@ private SqlSession openSessionFromConnection(ExecutorType execType, Connection c
     try {
         boolean autoCommit;
         try {
+            // 获取事务是否开启自动提交
             autoCommit = connection.getAutoCommit();
         } catch (SQLException e) {
           // Failover to true, as most poor drivers
           // or databases won't support transactions
           autoCommit = true;
       }
+      // 获取配置环境
       final Environment environment = configuration.getEnvironment();
+      // 获取事务对象
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
       final Transaction tx = transactionFactory.newTransaction(connection);
+      // 获取执行器
       final Executor executor = configuration.newExecutor(tx, execType);
+      // 构造一个SqlSession对象返回
       return new DefaultSqlSession(configuration, executor, autoCommit);
     } catch (Exception e) {
         throw ExceptionFactory.wrapException("Error opening session.  Cause: " + e, e);
@@ -325,6 +334,7 @@ Mapper是一个接口，没有任何实现类。主要作用就是用来映射Sq
 Mapper接口的名称要和对应sql语句的xml文件同名，Mapper接口中定义的方法名称对应了xml文件中的语句id。
 
 #### 四大对象生命周期
+
 SqlSessionFactoryBuiler只需要在创建SqlSessionFactory对象的时候使用，创建完成之后即可被丢弃。SqlSessionFactory全局唯一，是一个单例对象，但是需要全局存在。SqlSession一般对应了一个request，Mapper一般控制在方法内。
 
 | 对象                    | 生命周期                                          |
