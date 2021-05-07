@@ -33,6 +33,7 @@
 - [缓存更新策略](https://ycf-code.xyz/p/%E7%BC%93%E5%AD%98%E6%9B%B4%E6%96%B0%E7%AD%96%E7%95%A5/)
 - [MyBatis四大核心对象](https://ycf-code.xyz/p/mybatis4大核心对象/)
 - [MyBatis中SqlSession下四大对象](https://ycf-code.xyz/p/mybatis%E4%B8%ADsqlsession%E4%B8%8B%E5%9B%9B%E5%A4%A7%E5%AF%B9%E8%B1%A1/)
+- [JDK动态代理和CGLIB动态代理](https://ycf-code.xyz/p/jdk%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E5%92%8Ccglib%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/)
 
 <br>正在更新......🕒
 
