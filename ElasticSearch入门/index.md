@@ -1,5 +1,5 @@
 ---
-title: ElasticSearch入门
+title: ElasticSearch 7 入门
 description: ElasticSearch介绍，环境搭建以及基本操作。
 date: 2021-05-08
 tags: 
