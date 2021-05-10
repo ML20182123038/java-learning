@@ -27,6 +27,7 @@
 - [SpringMVC转发与重定向](https://ycf-code.xyz/p/spring-mvc-%E9%87%8D%E5%AE%9A%E5%90%91%E5%92%8C%E8%BD%AC%E5%8F%91/)
 - [SpringBoot整合Redis](https://ycf-code.xyz/p/springboot%E6%95%B4%E5%90%88redis/)
 - [SpringBoot文件上传与下载](https://ycf-code.xyz/p/springboot%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E4%B8%8E%E4%B8%8B%E8%BD%BD/)
+- [SpringBoot集成ElasticSearch 7](https://ycf-code.xyz/p/springboot集成elasticsearch-7/)
 - [Spring中AOP简介及AspectJ五大注解通知](https://ycf-code.xyz/p/spring%E4%B8%ADaop%E7%AE%80%E4%BB%8B%E5%8F%8Aaspectj%E4%BA%94%E5%A4%A7%E9%80%9A%E7%9F%A5%E6%B3%A8%E8%A7%A3/)
 - [序列化与反序列化](https://ycf-code.xyz/p/%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/)
 - [注解与反射](https://ycf-code.xyz/p/%E6%B3%A8%E8%A7%A3%E4%B8%8E%E5%8F%8D%E5%B0%84/)
